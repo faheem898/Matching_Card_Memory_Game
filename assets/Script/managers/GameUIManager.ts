@@ -8,17 +8,23 @@ export class GameUIManager extends Component {
 	matchesLabel: Label = null;
 	@property(Label)
 	turnLabel: Label = null;
+	@property(Label)
+	scoreLabel: Label = null;
 
 	initialize() {
-		this.setMatchesCount(0);
-		this.setTurnCount(0);
+		this.updateMatches(0);
+		this.updateTurns(0);
 	}
 
-	setMatchesCount(matches: number) {
+	updateScore(score: number) {
+		this.scoreLabel.string = score.toString();
+	}
+
+	updateMatches(matches: number) {
 		this.matchesLabel.string = matches.toString();
 	}
 
-	setTurnCount(turn: number) {
+	updateTurns(turn: number) {
 		this.turnLabel.string = turn.toString();
 	}
 

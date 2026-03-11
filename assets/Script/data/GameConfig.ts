@@ -43,4 +43,5 @@ export enum GameScene {
 
 export enum GameEvents {
 	Card_Flipped = 'Card_Flipped',
+	NEXT_LEVEL = 'NEXT_LEVEL',
 }

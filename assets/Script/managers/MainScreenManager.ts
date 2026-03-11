@@ -41,7 +41,7 @@ export class MainScreenManager extends Component {
 	onClickStartGame() {
 		const index = this.getSelectedDifficultyIndex();
 		this.applyDifficultyConfig(index);
-
+		GameModel.difficultyIndex = index;
 		director.loadScene(GameScene.Game);
 	}
 }
