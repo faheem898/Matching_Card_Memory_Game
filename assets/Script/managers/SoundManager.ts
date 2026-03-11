@@ -1,5 +1,5 @@
 import { AudioClip, AudioSource } from 'cc';
-import { GameModel } from '../data/GameModel'; // Your model holding sound settings
+import { GameModel } from '../data/GameModel';
 
 export class SoundManager {
 	private static instance: SoundManager;
@@ -34,11 +34,23 @@ export class SoundManager {
 		this.bgAudioSource.stop();
 	}
 
-	// Play SFX once
-	playSFX(clip: AudioClip) {
+	pauseBGMusic() {
+		if (this.bgAudioSource.playing) {
+			this.bgAudioSource.pause();
+		}
+	}
+
+	resumeBGMusic() {
+		if (!GameModel.isMusicOff && this.bgAudioSource.clip && !this.bgAudioSource.playing) {
+			this.bgAudioSource.play();
+		}
+	}
+
+	playSFX(clip: AudioClip, volume: number = 1) {
 		if (!clip) return;
 		if (GameModel.isMusicOff) return;
-		this.sfxAudioSource.playOneShot(clip, 1);
+
+		this.sfxAudioSource.playOneShot(clip, volume);
 	}
 
 	stopAllSFX() {

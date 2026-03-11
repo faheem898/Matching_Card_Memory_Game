@@ -21,6 +21,7 @@ export class GameManager extends Component {
 	popUpManager: PopUpManager = null;
 
 	private openedCards: Card[] = [];
+	private cardQueue: Card[] = [];
 	private matches: number = 0;
 	private turns: number = 0;
 	private isChecking: boolean = false;
@@ -46,7 +47,7 @@ export class GameManager extends Component {
 
 	protected onDestroy(): void {
 		EventManager.getDispatcher().off(GameEvents.Card_Flipped, this.onCardFlipped, this);
-		EventManager.getDispatcher().on(GameEvents.NEXT_LEVEL, this.startNextLevel, this);
+		EventManager.getDispatcher().off(GameEvents.NEXT_LEVEL, this.startNextLevel, this);
 	}
 
 	private showHint() {
@@ -60,48 +61,64 @@ export class GameManager extends Component {
 	}
 
 	private onCardFlipped(card: Card) {
-		if (this.isChecking) return;
+		if (!card || card.isMatched) return;
+		if (this.cardQueue.includes(card)) return;
 
-		if (this.openedCards.length >= 2) return;
+		// Add card to queue
+		this.cardQueue.push(card);
 
-		this.openedCards.push(card);
+		// Process queue if not already
+		if (!this.isChecking) {
+			this.processQueue();
+		}
+	}
 
-		if (this.openedCards.length < 2) return;
+	private async processQueue() {
+		while (this.cardQueue.length > 0) {
+			const card = this.cardQueue.shift();
+			if (!card) continue;
 
-		this.turns += 1;
+			this.openedCards.push(card);
+			SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Cardflip]);
+			card.flipToFront();
 
-		const [card1, card2] = this.openedCards;
+			if (this.openedCards.length < 2) {
+				await this.wait(150);
+				continue;
+			}
 
-		this.isChecking = true;
+			this.turns++;
+			this.isChecking = true;
+			const [card1, card2] = this.openedCards;
 
-		if (card1.frontSprite.spriteFrame === card2.frontSprite.spriteFrame) {
-			// MATCH
-			this.handleMatch();
-			this.matches += 1;
+			if (card1.frontSprite.spriteFrame === card2.frontSprite.spriteFrame) {
+				// MATCH
+				this.handleMatch();
+				this.matches += 1;
 
-			card1.setMatched();
-			card2.setMatched();
-
-			SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Match]);
-
-			this.openedCards = [];
-			this.isChecking = false;
-
-			this.checkGameOver();
-		} else {
-			// MISMATCH
-			setTimeout(() => {
-				this.handleMismatch();
-
-				card1.flipToBack();
-				card2.flipToBack();
-
-				SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Mismatch]);
-
+				card1.setMatched();
+				card2.setMatched();
+				SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Match]);
 				this.openedCards = [];
 				this.isChecking = false;
-			}, 800);
+				this.checkGameOver();
+			} else {
+				// MISMATCH
+				await this.wait(800);
+				card1.flipToBack();
+				card2.flipToBack();
+				SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Mismatch]);
+				this.handleMismatch();
+				this.openedCards = [];
+				this.isChecking = false;
+			}
+
+			await this.wait(100); // small gap before next in queue
 		}
+	}
+
+	private wait(ms: number) {
+		return new Promise<void>((resolve) => setTimeout(resolve, ms));
 	}
 
 	private handleMatch() {
@@ -160,6 +177,7 @@ export class GameManager extends Component {
 		GameModel.turns = 0;
 
 		this.openedCards = [];
+		this.cardQueue = [];
 
 		this.CardGridManager.populateGrid();
 		this.gameUIManager.initialize();
