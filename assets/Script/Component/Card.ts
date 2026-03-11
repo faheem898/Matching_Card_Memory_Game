@@ -1,6 +1,8 @@
 import { _decorator, Component, Node, Sprite, SpriteFrame, tween, Vec3, EventTouch } from 'cc';
 import EventManager from '../managers/EventManager';
-import { GameEvents } from '../data/GameConfig';
+import { AudioFiles, GameEvents } from '../data/GameConfig';
+import { SoundManager } from '../managers/SoundManager';
+import { GameModel } from '../data/GameModel';
 const { ccclass, property } = _decorator;
 
 @ccclass('Card')
@@ -30,6 +32,7 @@ export class Card extends Component {
 		if (this.isFlipped || this.isMatched) return;
 
 		this.flipToFront();
+		SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Cardflip]);
 		// Dispatch event to notify GameManager
 		EventManager.getDispatcher().emit(GameEvents.Card_Flipped, this);
 	}
@@ -37,7 +40,6 @@ export class Card extends Component {
 	flipToFront() {
 		if (!this.backSprite || !this.frontSprite) return;
 		this.isFlipped = true;
-
 		tween(this.node)
 			.to(0.15, { scale: new Vec3(0, 1, 1) })
 			.call(() => {
@@ -50,7 +52,6 @@ export class Card extends Component {
 	flipToBack() {
 		if (!this.backSprite || !this.frontSprite) return;
 		this.isFlipped = false;
-
 		tween(this.node)
 			.to(0.15, { scale: new Vec3(0, 1, 1) })
 			.call(() => {

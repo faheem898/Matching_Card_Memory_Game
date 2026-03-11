@@ -1,4 +1,4 @@
-import { SpriteFrame } from 'cc';
+import { AudioClip, SpriteFrame } from 'cc';
 import { DifficultyConfig } from '../Interface/Interface';
 
 export class GameModel {
@@ -9,4 +9,6 @@ export class GameModel {
 	public static matches: number = 0;
 	public static combo: number = 0;
 	public static difficultyIndex: number = 0;
+	public static isMusicOff: Boolean = false;
+	public static audioClips: AudioClip[] = [];
 }

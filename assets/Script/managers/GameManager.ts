@@ -2,10 +2,11 @@ import { _decorator, Component } from 'cc';
 import { CardGridManager } from './CardGridManager';
 import { GameUIManager } from './GameUIManager';
 import EventManager from './EventManager';
-import { DifficultyConfigs, GameEvents } from '../data/GameConfig';
+import { AudioFiles, DifficultyConfigs, GameEvents } from '../data/GameConfig';
 import { Card } from '../Component/Card';
 import { GameModel } from '../data/GameModel';
 import { PopUpManager } from './PopUpManager';
+import { SoundManager } from './SoundManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -35,6 +36,7 @@ export class GameManager extends Component {
 		this.gameUIManager.initialize();
 		setTimeout(() => this.showHint(), 100);
 		this.registerListener();
+		SoundManager.getInstance().playBGMusic(GameModel.audioClips[AudioFiles.Bg]);
 	}
 
 	protected registerListener() {
@@ -49,8 +51,10 @@ export class GameManager extends Component {
 
 	private showHint() {
 		const cards = this.CardGridManager.node.children.map((c) => c.getComponent(Card)!);
+		SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Cardflip]);
 		cards.forEach((c) => c.flipToFront());
 		setTimeout(() => {
+			SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Cardflip]);
 			cards.forEach((c) => c.flipToBack());
 		}, 1000);
 	}
@@ -78,6 +82,8 @@ export class GameManager extends Component {
 			card1.setMatched();
 			card2.setMatched();
 
+			SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Match]);
+
 			this.openedCards = [];
 			this.isChecking = false;
 
@@ -89,6 +95,8 @@ export class GameManager extends Component {
 
 				card1.flipToBack();
 				card2.flipToBack();
+
+				SoundManager.getInstance().playSFX(GameModel.audioClips[AudioFiles.Mismatch]);
 
 				this.openedCards = [];
 				this.isChecking = false;

@@ -45,3 +45,11 @@ export enum GameEvents {
 	Card_Flipped = 'Card_Flipped',
 	NEXT_LEVEL = 'NEXT_LEVEL',
 }
+export enum AudioFiles {
+	Bg,
+	Cardflip,
+	Match,
+	Mismatch,
+	GameOver,
+	buttonClick,
+}
