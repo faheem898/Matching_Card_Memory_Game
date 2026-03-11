@@ -8,4 +8,5 @@ export interface GridLayout {
 export interface DifficultyConfig {
 	level: DifficultyLevel;
 	layout: GridLayout;
+	totalCards: number;
 }

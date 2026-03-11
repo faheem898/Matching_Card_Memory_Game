@@ -1,6 +1,7 @@
 import { _decorator, Component, director, ToggleContainer } from 'cc';
 import { DifficultyLevel, DifficultyConfigs, GameScene } from '../data/GameConfig';
 import { GridLayout } from '../Interface/Interface';
+import { GameModel } from '../data/GameModel';
 
 const { ccclass, property } = _decorator;
 
@@ -33,6 +34,8 @@ export class MainScreenManager extends Component {
 
 		this.selectedDifficulty = config.level;
 		this.selectedLayout = config.layout;
+
+		GameModel._difficultyConfig = config;
 	}
 
 	onClickStartGame() {
